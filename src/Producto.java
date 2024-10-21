@@ -52,4 +52,9 @@ public class Producto {
     public void setNombreProveedor(String nombreProveedor) {
         this.nombreProveedor = nombreProveedor;
     }
+
+    @Override
+    public String toString() {
+        return "id: " + id + "\tProducto: " + nombre;
+    }
 }
