@@ -1,40 +1,63 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ComercializadoraOlivanders {
-    static Producto[] productos;
-    static Object[][] existenciasProductos;
+    static List<Producto> productos = new ArrayList<>();
+    static Map<Producto, Integer> productosStock = new HashMap<>();
     static int id = 1; //automatizar asignacion de id
+    static boolean salir = false;
 
     public static void main(String[] args) {
-        int n, existencias;
-        String nombre, numSerie, nombreProveedor;
+        int opcion, existencias;
         double valor;
-        n = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite el numero de productos a ingresar", "Numero de productos", JOptionPane.INFORMATION_MESSAGE));
-        productos = new Producto[n];
-        existenciasProductos = new Object[n][2];
-        for (int i = 0; i < n; i++) {
-            nombre = JOptionPane.showInputDialog(null, "Digite el nombre del producto " + (i+1), "Nombre del producto", JOptionPane.INFORMATION_MESSAGE);
-            numSerie = JOptionPane.showInputDialog(null, "Numero de serie", "Numero de serie", JOptionPane.INFORMATION_MESSAGE);
-            valor = Double.parseDouble(JOptionPane.showInputDialog(null, "Digite el valor", "Valor", JOptionPane.INFORMATION_MESSAGE));
-            nombreProveedor = JOptionPane.showInputDialog(null, "Nombre del proveedor", "Proveedor", JOptionPane.INFORMATION_MESSAGE);
-            existencias = Integer.parseInt(JOptionPane.showInputDialog(null, "Numero de existencias del producto " + (i+1), "Existencias", JOptionPane.INFORMATION_MESSAGE));
-
-            productos[i] = new Producto(id, nombre, numSerie, valor, nombreProveedor);
-            existenciasProductos[i][0] = productos[i];
-            existenciasProductos[i][1] = existencias;
-            id++;
+        opcion = menu();
+        while (!salir) {
+            switch (opcion) {
+                case 1 -> {
+                    registrarProducto();
+                    opcion = menu();
+                }
+                case 2 -> /*modificarProducto();*/salir = true;
+                case 3 -> /*eliminarProducto();*/salir = true;
+                case 5 -> {
+                    listarProductos();
+                    opcion = menu();
+                }
+                case 6 -> salir = true;
+            }
         }
+    }
 
-        JOptionPane.showMessageDialog(null, "Procedemos a listar los productos", "Productos", JOptionPane.INFORMATION_MESSAGE);
-        listarProductos();
+    private static int menu() {
+        return Integer.parseInt(JOptionPane.showInputDialog(null, "Menu: \n1. Registrar producto\n2. Modificar producto \n3. Eliminar producto\4. Venta\n5. Mostrar productos\n6. Salir", "Numero de productos", JOptionPane.INFORMATION_MESSAGE));
+    }
+
+    private static void registrarProducto() {
+        String nombre = JOptionPane.showInputDialog(null, "Digite el nombre del producto cuyo id será " + (id), "Nombre del producto", JOptionPane.INFORMATION_MESSAGE);
+        String numSerie = JOptionPane.showInputDialog(null, "Numero de serie", "Numero de serie", JOptionPane.INFORMATION_MESSAGE);
+        double valor = Double.parseDouble(JOptionPane.showInputDialog(null, "Digite el valor", "Valor", JOptionPane.INFORMATION_MESSAGE));
+        String nombreProveedor = JOptionPane.showInputDialog(null, "Nombre del proveedor", "Proveedor", JOptionPane.INFORMATION_MESSAGE);
+        int existencias = Integer.parseInt(JOptionPane.showInputDialog(null, "Numero de existencias del producto", "Existencias", JOptionPane.INFORMATION_MESSAGE));
+
+        Producto p = new Producto(id, nombre, numSerie, valor, nombreProveedor);
+        productos.add(p);
+        productosStock.put(p, existencias);
+        id++;
     }
 
     private static void listarProductos() {
         String stringToShow = "Identificacion\tNombre del Producto\tExistencia\n\n";
-        for (int i = 0; i < productos.length; i++) {
-            stringToShow += existenciasProductos[i][0].toString() + "\tExistencias: " + existenciasProductos[i][1] + "\n";
+
+        for (Map.Entry<Producto, Integer> entry : productosStock.entrySet()) {
+            Producto p = entry.getKey();
+            int stock = entry.getValue();
+            stringToShow += p.toString() + "\tExistencias: " + stock + "\n";
         }
+
         //JTextArea Configuration
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
