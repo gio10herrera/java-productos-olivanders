@@ -57,6 +57,18 @@ public class ComercializadoraOlivanders {
         }
     }
 
+    private static void listarVentas() {
+        if (!ventas.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Mostraremos los id de las ventas y los precios totales");
+            String stringToShow = "Factura de venta\tTotal Factura\n\n";
+            for (Venta venta : ventas) {
+                stringToShow += venta.getNumFactura() + "\t$" + venta.getTotal() + "\n";
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "No hay ventas", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private static void mostrarVenta() {
         int id = Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese el ID del factura", "Mostrar Factura", JOptionPane.INFORMATION_MESSAGE));
         Venta venta = getVentaById(id);
