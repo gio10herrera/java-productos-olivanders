@@ -1,40 +1,137 @@
+import com.sun.tools.javac.Main;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ComercializadoraOlivanders {
-    static Producto[] productos;
-    static Object[][] existenciasProductos;
+    private static final Logger logger = Logger.getLogger(ComercializadoraOlivanders.class.getName());
+    static List<Producto> productos = new ArrayList<>();
+    static Map<Producto, Integer> productosStock = new HashMap<>();
     static int id = 1; //automatizar asignacion de id
+    static boolean salir = false;
 
     public static void main(String[] args) {
-        int n, existencias;
-        String nombre, numSerie, nombreProveedor;
-        double valor;
-        n = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite el numero de productos a ingresar", "Numero de productos", JOptionPane.INFORMATION_MESSAGE));
-        productos = new Producto[n];
-        existenciasProductos = new Object[n][2];
-        for (int i = 0; i < n; i++) {
-            nombre = JOptionPane.showInputDialog(null, "Digite el nombre del producto " + (i+1), "Nombre del producto", JOptionPane.INFORMATION_MESSAGE);
-            numSerie = JOptionPane.showInputDialog(null, "Numero de serie", "Numero de serie", JOptionPane.INFORMATION_MESSAGE);
-            valor = Double.parseDouble(JOptionPane.showInputDialog(null, "Digite el valor", "Valor", JOptionPane.INFORMATION_MESSAGE));
-            nombreProveedor = JOptionPane.showInputDialog(null, "Nombre del proveedor", "Proveedor", JOptionPane.INFORMATION_MESSAGE);
-            existencias = Integer.parseInt(JOptionPane.showInputDialog(null, "Numero de existencias del producto " + (i+1), "Existencias", JOptionPane.INFORMATION_MESSAGE));
+        int opcion;
+        opcion = menu();
+        while (!salir) {
+            switch (opcion) {
+                case 1 -> {
+                    registrarProducto();
+                    opcion = menu();
+                }
+                case 2 -> {
+                    modificarProducto();
+                    opcion = menu();
+                }
+                case 3 -> {
+                    eliminarProducto();
+                    opcion = menu();
+                }
+                case 4 -> {
+                    listarProductos();
+                    opcion = menu();
+                }
+                case 5 -> salir = true;
+                default -> JOptionPane.showMessageDialog(null, "Opcion no valida", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
 
-            productos[i] = new Producto(id, nombre, numSerie, valor, nombreProveedor);
-            existenciasProductos[i][0] = productos[i];
-            existenciasProductos[i][1] = existencias;
-            id++;
+    private static void eliminarProducto() {
+        int id = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite el id del producto", "Buscar producto", JOptionPane.INFORMATION_MESSAGE));
+        Producto p = getProductoById(id);
+        if (p != null) {
+            if (productos.remove(p)){
+                productosStock.remove(p);
+                JOptionPane.showMessageDialog(null, "Producto eliminado exitosamente", "Existoso", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Producto no existe", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
 
-        JOptionPane.showMessageDialog(null, "Procedemos a listar los productos", "Productos", JOptionPane.INFORMATION_MESSAGE);
-        listarProductos();
+    }
+
+    private static void modificarProducto() {
+
+        int id = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite el id del producto", "Buscar producto", JOptionPane.INFORMATION_MESSAGE));
+        Producto p = getProductoById(id);
+        if (p != null) {
+            int op = Integer.parseInt(JOptionPane.showInputDialog(null, "1. Modificar nombre del producto\n2. Modificar precio del producto\n3. Modificar nombre del proveedor\n4. Modificar Existencias", "Modificar producto", JOptionPane.INFORMATION_MESSAGE));
+
+            switch (op) {
+                case 1 -> {
+                    String name = JOptionPane.showInputDialog(null, "Digite el nuevo nombre del producto", "Modificar nombre", JOptionPane.INFORMATION_MESSAGE);
+                    p.setNombre(name);
+                    JOptionPane.showMessageDialog(null, "Nombre modificado", "Exitoso", JOptionPane.INFORMATION_MESSAGE);
+                }
+                case 2 -> {
+                    double price = Double.parseDouble(JOptionPane.showInputDialog(null, "Digite el precio del producto", "Modificar precio", JOptionPane.INFORMATION_MESSAGE));
+                    p.setValor(price);
+                    JOptionPane.showMessageDialog(null, "Precio modificado", "Exitoso", JOptionPane.INFORMATION_MESSAGE);
+                }
+                case 3 -> {
+                    String providerName = JOptionPane.showInputDialog(null, "Digite el nuevo nombre del producto", "Modificar nombre", JOptionPane.INFORMATION_MESSAGE);
+                    p.setNombreProveedor(providerName);
+                    JOptionPane.showMessageDialog(null, "Nombre del proveedor modificado", "Exitoso", JOptionPane.INFORMATION_MESSAGE);
+                }
+                case 4 -> {
+                    int stock = Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese la nueva cantidad", "Modificar stock", JOptionPane.INFORMATION_MESSAGE));
+                    if (productosStock.containsKey(p)) {
+                        productosStock.put(p, stock);
+                        logger.log(Level.INFO, "nueva cantidad {0}", productosStock.get(p));
+                        JOptionPane.showMessageDialog(null, "Existencias modificadas", "Exitoso", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No se encuentra el Producto y las existencias", "Exitoso", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                default -> JOptionPane.showMessageDialog(null, "Opcion no valida", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "No existe el producto", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private static Producto getProductoById(int id) {
+        for (Producto p : productos) {
+            if (p.getId() == id) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    private static int menu() {
+        return Integer.parseInt(JOptionPane.showInputDialog(null, "Menu: \n1. Registrar producto\n2. Modificar producto \n3. Eliminar producto\4. Venta\n4. Mostrar productos\n5. Salir", "Numero de productos", JOptionPane.INFORMATION_MESSAGE));
+    }
+
+    private static void registrarProducto() {
+        String nombre = JOptionPane.showInputDialog(null, "Digite el nombre del producto cuyo id será " + (id), "Nombre del producto", JOptionPane.INFORMATION_MESSAGE);
+        String numSerie = JOptionPane.showInputDialog(null, "Numero de serie", "Numero de serie", JOptionPane.INFORMATION_MESSAGE);
+        double valor = Double.parseDouble(JOptionPane.showInputDialog(null, "Digite el valor", "Valor", JOptionPane.INFORMATION_MESSAGE));
+        String nombreProveedor = JOptionPane.showInputDialog(null, "Nombre del proveedor", "Proveedor", JOptionPane.INFORMATION_MESSAGE);
+        int existencias = Integer.parseInt(JOptionPane.showInputDialog(null, "Numero de existencias del producto", "Existencias", JOptionPane.INFORMATION_MESSAGE));
+
+        Producto p = new Producto(id, nombre, numSerie, valor, nombreProveedor);
+        productos.add(p);
+        productosStock.put(p, existencias);
+        id++;
     }
 
     private static void listarProductos() {
         String stringToShow = "Identificacion\tNombre del Producto\tExistencia\n\n";
-        for (int i = 0; i < productos.length; i++) {
-            stringToShow += existenciasProductos[i][0].toString() + "\tExistencias: " + existenciasProductos[i][1] + "\n";
+
+        for (Map.Entry<Producto, Integer> entry : productosStock.entrySet()) {
+            Producto p = entry.getKey();
+            int stock = entry.getValue();
+            stringToShow += p.toString() + "\tExistencias: " + stock + "\n";
         }
+
         //JTextArea Configuration
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
