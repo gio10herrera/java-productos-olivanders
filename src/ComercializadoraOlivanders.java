@@ -1,11 +1,16 @@
+import com.sun.tools.javac.Main;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ComercializadoraOlivanders {
+    private static final Logger logger = Logger.getLogger(ComercializadoraOlivanders.class.getName());
     static List<Producto> productos = new ArrayList<>();
     static Map<Producto, Integer> productosStock = new HashMap<>();
     static int id = 1; //automatizar asignacion de id
@@ -39,7 +44,7 @@ public class ComercializadoraOlivanders {
         int id = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite el id del producto", "Buscar producto", JOptionPane.INFORMATION_MESSAGE));
         Producto p = getProductoById(id);
         if (p != null) {
-            int op = Integer.parseInt(JOptionPane.showInputDialog(null, "1. Modificar nombre del producto\n2. Modificar precio del producto\n3. Modificar nombre del proveedor", "Modificar producto", JOptionPane.INFORMATION_MESSAGE));
+            int op = Integer.parseInt(JOptionPane.showInputDialog(null, "1. Modificar nombre del producto\n2. Modificar precio del producto\n3. Modificar nombre del proveedor\n4. Modificar Existencias", "Modificar producto", JOptionPane.INFORMATION_MESSAGE));
 
             switch (op) {
                 case 1 -> {
@@ -56,6 +61,16 @@ public class ComercializadoraOlivanders {
                     String providerName = JOptionPane.showInputDialog(null, "Digite el nuevo nombre del producto", "Modificar nombre", JOptionPane.INFORMATION_MESSAGE);
                     p.setNombreProveedor(providerName);
                     JOptionPane.showMessageDialog(null, "Nombre del proveedor modificado", "Exitoso", JOptionPane.INFORMATION_MESSAGE);
+                }
+                case 4 -> {
+                    int stock = Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese la nueva cantidad", "Modificar stock", JOptionPane.INFORMATION_MESSAGE));
+                    if (productosStock.containsKey(p)) {
+                        productosStock.put(p, stock);
+                        logger.log(Level.INFO, "nueva cantidad {0}", productosStock.get(p));
+                        JOptionPane.showMessageDialog(null, "Existencias modificadas", "Exitoso", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No se encuentra el Producto y las existencias", "Exitoso", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
                 default -> JOptionPane.showMessageDialog(null, "Opcion no valida", "Error", JOptionPane.ERROR_MESSAGE);
             }
