@@ -15,6 +15,8 @@ public class ComercializadoraOlivanders {
     static Map<Producto, Integer> productosStock = new HashMap<>();
     static int id = 1; //automatizar asignacion de id
     static boolean salir = false;
+    static int numFactura = 1010;
+    static List<Venta> ventas = new ArrayList<>();
 
     public static void main(String[] args) {
         int opcion;
@@ -52,6 +54,47 @@ public class ComercializadoraOlivanders {
                 case 8 -> salir = true;
                 default -> JOptionPane.showMessageDialog(null, "Opcion no valida", "Error", JOptionPane.ERROR_MESSAGE);
             }
+        }
+    }
+
+    private static void nuevaVenta() {
+        if (!productosStock.isEmpty()) {
+            int codigo, cant;
+            Map<Producto, Integer>  productosVenta  = new HashMap<>();
+
+            int numProductos = Integer.parseInt(JOptionPane.showInputDialog(null, "Cuantos productos desea comprar?", "Numero de productos", JOptionPane.INFORMATION_MESSAGE));
+            for (int i = 0; i < numProductos; i++) {
+                String stringToShow = "Digita el codigo del producto a comprar\n\n";
+                for (Producto producto : productosStock.keySet()) {
+                    int stock = productosStock.get(producto);
+                    stringToShow += "Codigo: " + producto.getId() + ". " + producto.getNombre() + " - La cantidad no puede ser mayor a " + stock + "\n";
+                }
+                codigo = Integer.parseInt(JOptionPane.showInputDialog(null, stringToShow, "Producto", JOptionPane.INFORMATION_MESSAGE));
+                Producto p = getProductoById(codigo);
+                if (p != null) {
+                    boolean sw = false;
+                    int cantActual = productosStock.get(p);
+                    cant = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite la cantidad, no debe ser mayor a: " + cantActual, "Cantidad", JOptionPane.INFORMATION_MESSAGE));
+                    while (cant > cantActual) {
+                        cant = Integer.parseInt(JOptionPane.showInputDialog(null, "ERROR! cantidad, no debe ser mayor a: " + cantActual, "Digite la Cantidad", JOptionPane.INFORMATION_MESSAGE));
+                    }
+                    productosVenta.put(p, cant);
+                    int actualizarCant = cantActual - cant;
+                    productosStock.put(p, actualizarCant);
+                } else {
+                    JOptionPane.showMessageDialog(null, "El producto no existe", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            if (!productosVenta.isEmpty()) {
+                Venta venta = new Venta(numFactura++, productosVenta);
+                venta.calcularTotal();
+                ventas.add(venta);
+                JOptionPane.showMessageDialog(null, venta.toString(), "Factura de Venta", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Intente realizar la venta de nuevo, Error en los productos", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "La lista de productos esta vacia", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
