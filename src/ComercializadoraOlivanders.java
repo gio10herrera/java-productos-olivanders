@@ -29,7 +29,10 @@ public class ComercializadoraOlivanders {
                     modificarProducto();
                     opcion = menu();
                 }
-                case 3 -> /*eliminarProducto();*/salir = true;
+                case 3 -> {
+                    eliminarProducto();
+                    opcion = menu();
+                }
                 case 4 -> {
                     listarProductos();
                     opcion = menu();
@@ -40,7 +43,22 @@ public class ComercializadoraOlivanders {
         }
     }
 
+    private static void eliminarProducto() {
+        int id = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite el id del producto", "Buscar producto", JOptionPane.INFORMATION_MESSAGE));
+        Producto p = getProductoById(id);
+        if (p != null) {
+            if (productos.remove(p)){
+                productosStock.remove(p);
+                JOptionPane.showMessageDialog(null, "Producto eliminado exitosamente", "Existoso", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Producto no existe", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+    }
+
     private static void modificarProducto() {
+
         int id = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite el id del producto", "Buscar producto", JOptionPane.INFORMATION_MESSAGE));
         Producto p = getProductoById(id);
         if (p != null) {
