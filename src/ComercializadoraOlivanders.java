@@ -37,7 +37,19 @@ public class ComercializadoraOlivanders {
                     listarProductos();
                     opcion = menu();
                 }
-                case 5 -> salir = true;
+                case 5 -> {
+                    nuevaVenta();
+                    opcion = menu();
+                }
+                case 6 -> {
+                    mostrarVenta();
+                    opcion = menu();
+                }
+                case 7 -> {
+                    listarVentas();
+                    opcion = menu();
+                }
+                case 8 -> salir = true;
                 default -> JOptionPane.showMessageDialog(null, "Opcion no valida", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -107,7 +119,7 @@ public class ComercializadoraOlivanders {
     }
 
     private static int menu() {
-        return Integer.parseInt(JOptionPane.showInputDialog(null, "Menu: \n1. Registrar producto\n2. Modificar producto \n3. Eliminar producto\4. Venta\n4. Mostrar productos\n5. Salir", "Numero de productos", JOptionPane.INFORMATION_MESSAGE));
+        return Integer.parseInt(JOptionPane.showInputDialog(null, "Menu: \n1. Registrar producto\n2. Modificar producto \n3. Eliminar producto\4. Venta\n4. Mostrar productos\n5. Nueva Venta\n6. Mostrar venta\n7. Listar ventas\n8. Salir", "Numero de productos", JOptionPane.INFORMATION_MESSAGE));
     }
 
     private static void registrarProducto() {
