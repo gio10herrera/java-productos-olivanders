@@ -15,6 +15,30 @@ public class ComercializadoraOlivanders {
     static Map<Producto, Integer> productosStock = new HashMap<>();
     static int id = 1; //automatizar asignacion de id
     static boolean salir = false;
+    static int numFactura = 1010;
+    static List<Venta> ventas = new ArrayList<>();
+    static JTextArea textArea;
+    static JScrollPane scrollPane;
+
+    static {
+        inicializarJTextArea();
+        inicializarScrollPane();
+    }
+
+    private static void inicializarScrollPane() {
+        scrollPane = new JScrollPane(textArea);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    }
+
+    private static void inicializarJTextArea() {
+        textArea = new JTextArea();
+        textArea.setEditable(false);
+        textArea.setSize(460, 400);
+        textArea.setBorder(new EmptyBorder(5, 45, 5, 5));
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+    }
 
     public static void main(String[] args) {
         int opcion;
@@ -37,9 +61,97 @@ public class ComercializadoraOlivanders {
                     listarProductos();
                     opcion = menu();
                 }
-                case 5 -> salir = true;
+                case 5 -> {
+                    nuevaVenta();
+                    opcion = menu();
+                }
+                case 6 -> {
+                    mostrarVenta();
+                    opcion = menu();
+                }
+                case 7 -> {
+                    listarVentas();
+                    opcion = menu();
+                }
+                case 8 -> salir = true;
                 default -> JOptionPane.showMessageDialog(null, "Opcion no valida", "Error", JOptionPane.ERROR_MESSAGE);
             }
+        }
+    }
+
+    private static void listarVentas() {
+        if (!ventas.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Mostraremos los id de las ventas y los precios totales");
+            String stringToShow = "Factura\tTotal\n";
+            for (Venta venta : ventas) {
+                stringToShow += venta.getNumFactura() + "\t$" + venta.getTotal() + "\n";
+            }
+            textArea.setText(stringToShow);
+            JOptionPane.showMessageDialog(null, scrollPane, "Todas las ventas", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "No hay ventas", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private static void mostrarVenta() {
+        int id = Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese el ID del factura", "Mostrar Factura", JOptionPane.INFORMATION_MESSAGE));
+        Venta venta = getVentaById(id);
+        if (venta != null) {
+            textArea.setText(venta.toString());
+            JOptionPane.showMessageDialog(null, scrollPane, "Factura de venta", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "No se encontro el venta", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private static Venta getVentaById(int id) {
+        for (Venta v : ventas) {
+            if (v.getNumFactura() == id) {
+                return v;
+            }
+        }
+        return null;
+    }
+
+    private static void nuevaVenta() {
+        if (!productosStock.isEmpty()) {
+            int codigo, cant;
+            Map<Producto, Integer>  productosVenta  = new HashMap<>();
+
+            int numProductos = Integer.parseInt(JOptionPane.showInputDialog(null, "Cuantos productos desea comprar?", "Numero de productos", JOptionPane.INFORMATION_MESSAGE));
+            for (int i = 0; i < numProductos; i++) {
+                String stringToShow = "Digita el codigo del producto a comprar\n\n";
+                for (Producto producto : productosStock.keySet()) {
+                    int stock = productosStock.get(producto);
+                    stringToShow += "Codigo: " + producto.getId() + ". " + producto.getNombre() + " - La cantidad no puede ser mayor a " + stock + "\n";
+                }
+                codigo = Integer.parseInt(JOptionPane.showInputDialog(null, stringToShow, "Producto", JOptionPane.INFORMATION_MESSAGE));
+                Producto p = getProductoById(codigo);
+                if (p != null) {
+                    boolean sw = false;
+                    int cantActual = productosStock.get(p);
+                    cant = Integer.parseInt(JOptionPane.showInputDialog(null, "Digite la cantidad, no debe ser mayor a: " + cantActual, "Cantidad", JOptionPane.INFORMATION_MESSAGE));
+                    while (cant > cantActual) {
+                        cant = Integer.parseInt(JOptionPane.showInputDialog(null, "ERROR! cantidad, no debe ser mayor a: " + cantActual, "Digite la Cantidad", JOptionPane.INFORMATION_MESSAGE));
+                    }
+                    productosVenta.put(p, cant);
+                    int actualizarCant = cantActual - cant;
+                    productosStock.put(p, actualizarCant);
+                } else {
+                    JOptionPane.showMessageDialog(null, "El producto no existe", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            if (!productosVenta.isEmpty()) {
+                Venta venta = new Venta(numFactura++, productosVenta);
+                venta.calcularTotal();
+                ventas.add(venta);
+                textArea.setText(venta.toString());
+                JOptionPane.showMessageDialog(null, scrollPane, "Factura de Venta", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Intente realizar la venta de nuevo, Error en los productos", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "La lista de productos esta vacia", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -107,7 +219,7 @@ public class ComercializadoraOlivanders {
     }
 
     private static int menu() {
-        return Integer.parseInt(JOptionPane.showInputDialog(null, "Menu: \n1. Registrar producto\n2. Modificar producto \n3. Eliminar producto\4. Venta\n4. Mostrar productos\n5. Salir", "Numero de productos", JOptionPane.INFORMATION_MESSAGE));
+        return Integer.parseInt(JOptionPane.showInputDialog(null, "Menu: \n1. Registrar producto\n2. Modificar producto \n3. Eliminar producto \n4. Mostrar productos\n5. Nueva Venta\n6. Mostrar venta\n7. Listar ventas\n8. Salir", "Numero de productos", JOptionPane.INFORMATION_MESSAGE));
     }
 
     private static void registrarProducto() {
@@ -124,22 +236,19 @@ public class ComercializadoraOlivanders {
     }
 
     private static void listarProductos() {
-        String stringToShow = "Identificacion\tNombre del Producto\tExistencia\n\n";
+        StringBuilder stringToShow = new StringBuilder("Identificacion\tProducto\tStock\n");
+        if (!productosStock.isEmpty()) {
+            for (Map.Entry<Producto, Integer> entry : productosStock.entrySet()) {
+                Producto p = entry.getKey();
+                int stock = entry.getValue();
+                stringToShow.append(p.toString()).append("\t").append(stock).append("\n");
+            }
 
-        for (Map.Entry<Producto, Integer> entry : productosStock.entrySet()) {
-            Producto p = entry.getKey();
-            int stock = entry.getValue();
-            stringToShow += p.toString() + "\tExistencias: " + stock + "\n";
+            //JTextArea Configuration
+            textArea.setText(stringToShow.toString());
+            JOptionPane.showMessageDialog(null, scrollPane, "Productos", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "No hay productos", "Error", JOptionPane.ERROR_MESSAGE);
         }
-
-        //JTextArea Configuration
-        JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
-        textArea.setSize(460, 400);
-        textArea.setBorder(new EmptyBorder(5, 45, 5, 5));
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setText(stringToShow);
-        JOptionPane.showMessageDialog(null, textArea, "Productos", JOptionPane.INFORMATION_MESSAGE);
     }
 }
