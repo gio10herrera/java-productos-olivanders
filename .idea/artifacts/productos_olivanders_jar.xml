@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="productos-olivanders:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/productos_olivanders_jar</output-path>
+    <root id="archive" name="productos-olivanders.jar">
+      <element id="module-output" name="productos-olivanders" />
+    </root>
+  </artifact>
+</component>
