@@ -17,6 +17,28 @@ public class ComercializadoraOlivanders {
     static boolean salir = false;
     static int numFactura = 1010;
     static List<Venta> ventas = new ArrayList<>();
+    static JTextArea textArea;
+    static JScrollPane scrollPane;
+
+    static {
+        inicializarJTextArea();
+        inicializarScrollPane();
+    }
+
+    private static void inicializarScrollPane() {
+        scrollPane = new JScrollPane(textArea);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    }
+
+    private static void inicializarJTextArea() {
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(false);
+        textArea.setSize(460, 400);
+        textArea.setBorder(new EmptyBorder(5, 45, 5, 5));
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+    }
 
     public static void main(String[] args) {
         int opcion;
@@ -64,6 +86,8 @@ public class ComercializadoraOlivanders {
             for (Venta venta : ventas) {
                 stringToShow += venta.getNumFactura() + "\t$" + venta.getTotal() + "\n";
             }
+            textArea.setText(stringToShow);
+            JOptionPane.showMessageDialog(null, textArea, "Todas las ventas", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "No hay ventas", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -219,12 +243,6 @@ public class ComercializadoraOlivanders {
         }
 
         //JTextArea Configuration
-        JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
-        textArea.setSize(460, 400);
-        textArea.setBorder(new EmptyBorder(5, 45, 5, 5));
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
         textArea.setText(stringToShow);
         JOptionPane.showMessageDialog(null, textArea, "Productos", JOptionPane.INFORMATION_MESSAGE);
     }
