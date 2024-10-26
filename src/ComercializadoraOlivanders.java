@@ -87,7 +87,7 @@ public class ComercializadoraOlivanders {
                 stringToShow += venta.getNumFactura() + "\t$" + venta.getTotal() + "\n";
             }
             textArea.setText(stringToShow);
-            JOptionPane.showMessageDialog(null, textArea, "Todas las ventas", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, scrollPane, "Todas las ventas", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "No hay ventas", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -97,7 +97,8 @@ public class ComercializadoraOlivanders {
         int id = Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese el ID del factura", "Mostrar Factura", JOptionPane.INFORMATION_MESSAGE));
         Venta venta = getVentaById(id);
         if (venta != null) {
-            JOptionPane.showMessageDialog(null, venta.toString(), "Factura de venta", JOptionPane.INFORMATION_MESSAGE);
+            textArea.setText(venta.toString());
+            JOptionPane.showMessageDialog(null, scrollPane, "Factura de venta", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "No se encontro el venta", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -244,6 +245,6 @@ public class ComercializadoraOlivanders {
 
         //JTextArea Configuration
         textArea.setText(stringToShow);
-        JOptionPane.showMessageDialog(null, textArea, "Productos", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, scrollPane, "Productos", JOptionPane.INFORMATION_MESSAGE);
     }
 }
